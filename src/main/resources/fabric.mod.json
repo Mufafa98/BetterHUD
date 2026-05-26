@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "better-hud",
+	"version": "${version}",
+	"name": "Better HUD",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/better-hud/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.mufafa98.better_hud.BetterHUD"
+		],
+		"client": [
+			"com.mufafa98.better_hud.client.BetterHUDClient"
+		]
+	},
+	"mixins": [
+		"better-hud.mixins.json",
+		{
+			"config": "better-hud.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~26.1",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
