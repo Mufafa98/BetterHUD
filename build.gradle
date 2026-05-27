@@ -47,7 +47,10 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	// Fix from here: https://www.reddit.com/r/fabricmc/comments/13u3r6d/the_project_is_not_a_valid_java_project_error/
+    it.options.release = 25
+    dependsOn 'genCommonSourcesWithVineflower'
+    dependsOn 'genClientOnlySourcesWithVineflower'
 }
 
 java {
