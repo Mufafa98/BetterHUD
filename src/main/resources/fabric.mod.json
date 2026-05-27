@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"com.mufafa98.better_hud.client.BetterHUDClient"
+		],
+		"modmenu": [
+			"com.mufafa98.better_hud.client.ModMenuIntegration"
 		]
 	},
 	"mixins": [
