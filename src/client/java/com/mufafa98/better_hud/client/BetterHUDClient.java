@@ -79,24 +79,22 @@ public class BetterHUDClient implements ClientModInitializer {
 	public static void renderArmorAt(GuiGraphicsExtractor graphics, int startX, int startY) {
 		Minecraft client = Minecraft.getInstance();
 		ItemStack[] itemsToDisplay = getEquippedItems(client);
+		ArmorConfig config = ArmorConfig.getInstance();
 
 		int textureSize = 16;
-		int gap = ArmorConfig.gapBetweenItems;
-		int margin = ArmorConfig.margin;
-		int spacedTexture = textureSize + gap;
+		int gap = config.gapBetweenItems;
+		int margin = config.margin;
 
-		int baseX = startX;
-		int baseY = startY;
-
-		if (ArmorConfig.renderVertically) {
-			baseX -= spacedTexture + margin;
-			baseY -= gap;
+		if (config.renderVertically) {
+			int baseX = startX - textureSize - margin;
+			int baseY = startY - margin;
 
 			for (ItemStack item : itemsToDisplay) {
 				if (item == null || item.isEmpty())
 					continue;
 
-				baseY -= spacedTexture;
+				// Move up by the texture size to draw the item
+				baseY -= textureSize;
 				graphics.item(item, baseX, baseY);
 
 				String text = "";
@@ -107,8 +105,12 @@ public class BetterHUDClient implements ClientModInitializer {
 				}
 
 				if (!text.isEmpty()) {
-					graphics.text(client.font, text, baseX - textureSize - gap, baseY + 4, 0xFFFFFFFF);
+					int textWidth = client.font.width(text);
+					// Text is offset slightly to the left of the item
+					graphics.text(client.font, text, baseX - textWidth - 4, baseY + 4, 0xFFFFFFFF);
 				}
+
+				baseY -= gap;
 			}
 		}
 	}
