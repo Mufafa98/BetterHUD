@@ -1,47 +1,35 @@
 package com.mufafa98.better_hud.client;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import net.fabricmc.loader.api.FabricLoader;
-
 public class ArmorConfig {
-    private static ArmorConfig INSTANCE;
-    private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("better-hud.json");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    // These two might me moved into Config
+    public int margin = 4;
+    public int screenMargin = 4;
 
     public boolean renderVertically = true;
-    public int margin = 4;
+    public int textureSize = 16;
+    public double centerX = 0.5;
+    public double centerY = 0.5;
     public int gapBetweenItems = 4;
+    public int gapBetweenIconAndText = 4;
 
-    private ArmorConfig() {
+    public ArmorConfig() {
     }
 
-    public static ArmorConfig getInstance() {
-        if (INSTANCE == null)
-            load();
-        return INSTANCE;
+    public int getTopLeftX(int screenWidth, int hudWidth) {
+        int centerAbs = (int) (centerX * screenWidth);
+        return Math.max(
+                screenMargin,
+                Math.min(
+                        screenWidth - hudWidth - screenMargin,
+                        centerAbs - hudWidth / 2));
     }
 
-    public static void load() {
-        try {
-            if (Files.exists(PATH)) {
-                INSTANCE = GSON.fromJson(Files.readString(PATH), ArmorConfig.class);
-            } else {
-                INSTANCE = new ArmorConfig();
-                INSTANCE.save();
-            }
-        } catch (Exception e) {
-            INSTANCE = new ArmorConfig();
-        }
-    }
-
-    public void save() {
-        try {
-            Files.writeString(PATH, GSON.toJson(this));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public int getTopLeftY(int screenHeight, int hudHeight) {
+        int centerAbs = (int) (centerY * screenHeight);
+        return Math.max(
+                screenMargin,
+                Math.min(
+                        screenHeight - hudHeight - screenMargin,
+                        centerAbs - hudHeight / 2));
     }
 }

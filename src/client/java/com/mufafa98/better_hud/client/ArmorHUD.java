@@ -7,10 +7,14 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import java.awt.Dimension;
 
 public class ArmorHUD implements HUDInterface {
 
+    private final ArmorConfig config;
+
     public ArmorHUD() {
+        this.config = Config.getInstance().getArmorConfig();
     }
 
     private static ItemStack[] getEquippedItems(Minecraft client) {
@@ -19,16 +23,66 @@ public class ArmorHUD implements HUDInterface {
             return new ItemStack[0];
 
         return new ItemStack[] {
-                player.getItemBySlot(EquipmentSlot.FEET),
-                player.getItemBySlot(EquipmentSlot.LEGS),
-                player.getItemBySlot(EquipmentSlot.CHEST),
-                player.getItemBySlot(EquipmentSlot.HEAD),
                 player.getItemBySlot(EquipmentSlot.MAINHAND),
-                player.getItemBySlot(EquipmentSlot.OFFHAND)
+                player.getItemBySlot(EquipmentSlot.OFFHAND),
+                player.getItemBySlot(EquipmentSlot.HEAD),
+                player.getItemBySlot(EquipmentSlot.CHEST),
+                player.getItemBySlot(EquipmentSlot.LEGS),
+                player.getItemBySlot(EquipmentSlot.FEET),
         };
     }
 
-    private static int countItemInInventory(Minecraft client, ItemStack itemToMatch) {
+    public Dimension getHudDimensions(Minecraft client) {
+        ItemStack[] items = getEquippedItems(client);
+
+        int count = 0;
+        for (ItemStack s : items)
+            if (!s.isEmpty())
+                count++;
+        if (count == 0)
+            return new Dimension(0, 0);
+
+        int maxTextWidth = getMaxTextWidth(client, items);
+        int totalItemWidth = config.textureSize + config.gapBetweenIconAndText + maxTextWidth;
+
+        int itemGap = config.gapBetweenItems;
+        int width, height;
+
+        if (config.renderVertically) {
+            width = totalItemWidth;
+            height = count * config.textureSize + (count - 1) * itemGap;
+        } else {
+            width = count * totalItemWidth + (count - 1) * itemGap;
+            height = config.textureSize;
+        }
+
+        return new Dimension(width, height);
+    }
+
+    private int getMaxTextWidth(Minecraft client, ItemStack[] items) {
+        int maxWidth = 0;
+        for (ItemStack item : items) {
+            if (item.isEmpty())
+                continue;
+
+            String text = "";
+            if (item.isDamageableItem()) {
+                int remaining = item.getMaxDamage() - item.getDamageValue();
+                text = String.valueOf(remaining);
+            } else if (item.getCount() > 1) {
+                text = String.valueOf(countItemInInventory(client, item));
+            }
+
+            if (!text.isEmpty()) {
+                int width = client.font.width(text);
+                if (width > maxWidth)
+                    maxWidth = width;
+            }
+        }
+        return maxWidth;
+    }
+
+    private int countItemInInventory(Minecraft client, ItemStack itemToMatch) {
         LocalPlayer player = client.player;
         if (player == null || itemToMatch.isEmpty())
             return 0;
@@ -46,27 +100,34 @@ public class ArmorHUD implements HUDInterface {
 
     @Override
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
-        renderArmorAt(graphics, graphics.guiWidth(), graphics.guiHeight());
+        Minecraft client = Minecraft.getInstance();
+        int screenWidth = graphics.guiWidth();
+        int screenHeight = graphics.guiHeight();
+
+        Dimension dim = getHudDimensions(client);
+        if (dim.width == 0 || dim.height == 0)
+            return;
+
+        int topLeftX = config.getTopLeftX(screenWidth, dim.width);
+        int topLeftY = config.getTopLeftY(screenHeight, dim.height);
+
+        renderArmorAt(graphics, topLeftX, topLeftY);
     }
 
-    public static void renderArmorAt(GuiGraphicsExtractor graphics, int startX, int startY) {
+    public void renderArmorAt(GuiGraphicsExtractor graphics, int posX, int posY) {
         Minecraft client = Minecraft.getInstance();
         ItemStack[] itemsToDisplay = getEquippedItems(client);
-        ArmorConfig config = ArmorConfig.getInstance();
 
-        int textureSize = 16;
+        int textureSize = config.textureSize;
         int gap = config.gapBetweenItems;
-        int margin = config.margin;
 
         if (config.renderVertically) {
-            int baseX = startX - textureSize - margin;
-            int baseY = startY - margin;
+            int baseX = posX;
+            int baseY = posY;
 
             for (ItemStack item : itemsToDisplay) {
                 if (item == null || item.isEmpty())
                     continue;
-
-                baseY -= textureSize;
                 graphics.item(item, baseX, baseY);
 
                 String text = "";
@@ -81,11 +142,12 @@ public class ArmorHUD implements HUDInterface {
                 }
 
                 if (!text.isEmpty()) {
-                    int textWidth = client.font.width(text);
-                    graphics.text(client.font, text, baseX - textWidth - 4, baseY + 4, color);
+                    int textX = baseX + textureSize + config.gapBetweenIconAndText;
+                    int textY = baseY + (textureSize - 9) / 2;
+                    graphics.text(client.font, text, textX, textY, color);
                 }
 
-                baseY -= gap;
+                baseY += textureSize + gap;
             }
         }
     }

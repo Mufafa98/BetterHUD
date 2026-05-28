@@ -17,27 +17,33 @@ public class CenteredDashboardScreen extends Screen {
 
     @Override
     protected void init() {
-        ArmorConfig config = ArmorConfig.getInstance();
+        Config config = Config.getInstance();
         GridLayout grid = new GridLayout();
         grid.defaultCellSetting().padding(5);
 
         // Render Vertically Checkbox
         grid.addChild(Checkbox.builder(Component.literal("Render Vertically"), this.minecraft.font)
-                .selected(config.renderVertically)
+                .selected(config.armor.renderVertically)
                 .onValueChange((checkbox, value) -> {
-                    config.renderVertically = value;
+                    config.armor.renderVertically = value;
                     config.save();
                 }).build(), 0, 0, 1, 2);
 
-        // Margin Controls (Slider + EditBox)
-        addSettingRow(grid, 1, "Margin", config.margin, 100, value -> {
-            config.margin = value;
+        // Slider for Center X (0-100)
+        addSettingRow(grid, 1, "Center X %", (int) (config.armor.centerX * 100), 100, percent -> {
+            config.armor.centerX = percent / 100.0;
+            config.save();
+        });
+
+        // Center Y
+        addSettingRow(grid, 2, "Center Y %", (int) (config.armor.centerY * 100), 100, percent -> {
+            config.armor.centerY = percent / 100.0;
             config.save();
         });
 
         // Gap Controls (Slider + EditBox)
-        addSettingRow(grid, 2, "Gap", config.gapBetweenItems, 50, value -> {
-            config.gapBetweenItems = value;
+        addSettingRow(grid, 3, "Gap", config.armor.gapBetweenItems, 50, value -> {
+            config.armor.gapBetweenItems = value;
             config.save();
         });
 
