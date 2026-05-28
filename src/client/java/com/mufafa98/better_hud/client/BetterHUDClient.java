@@ -98,16 +98,19 @@ public class BetterHUDClient implements ClientModInitializer {
 				graphics.item(item, baseX, baseY);
 
 				String text = "";
+				int color = 0xFFFFFFFF;
 				if (item.isDamageableItem()) {
 					text = String.valueOf(item.getMaxDamage() - item.getDamageValue());
+					if (item.getMaxDamage() - item.getDamageValue() <= item.getMaxDamage() * 0.1) {
+						color = 0xFFFF0000;
+					}
 				} else if (item.getCount() > 1) {
 					text = String.valueOf(countItemInInventory(client, item));
 				}
 
 				if (!text.isEmpty()) {
 					int textWidth = client.font.width(text);
-					// Text is offset slightly to the left of the item
-					graphics.text(client.font, text, baseX - textWidth - 4, baseY + 4, 0xFFFFFFFF);
+					graphics.text(client.font, text, baseX - textWidth - 4, baseY + 4, color);
 				}
 
 				baseY -= gap;
