@@ -13,7 +13,7 @@ public class Config {
     private static Config INSTANCE;
     private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("better-hud.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final int CURRENT_VERSION = 1;
+    private static final int CURRENT_VERSION = 2;
 
     // top-level version for the whole config file
     public int configVersion = CURRENT_VERSION;
@@ -52,9 +52,22 @@ public class Config {
                     }
                 } catch (Exception ignored) {
                 }
-
                 if (fileVersion == CURRENT_VERSION) {
                     INSTANCE = GSON.fromJson(json, Config.class);
+                } else if (fileVersion == 1) {
+                    if (fileVersion == 1) {
+                        INSTANCE = GSON.fromJson(json, Config.class);
+
+                        INSTANCE.configVersion = CURRENT_VERSION;
+
+                        INSTANCE.armor.lowDurabilityPercentage = 15;
+                        INSTANCE.armor.lowDurabilityColor = 0xFFFF0000;
+
+                        INSTANCE.armor.mediumDurabilityPercentage = 30;
+                        INSTANCE.armor.mediumDurabilityColor = 0xFFFFFF00;
+
+                        INSTANCE.save();
+                    }
                 } else if (fileVersion == -1) {
                     // legacy single ArmorConfig JSON: try to parse as ArmorConfig and wrap it
                     try {
