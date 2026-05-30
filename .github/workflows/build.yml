@@ -1,30 +1,34 @@
-# Automatically build the project and run any configured tests for every push
-# and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
-# against bad commits.
+name: Publish Release
 
-name: build
-on: [pull_request, push]
+on:
+  push:
+    tags:
+      - 'v*' # Triggers when you push a tag like v1.0.0
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write # Needed to create releases
+      
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v6
-      - name: setup jdk
-        uses: actions/setup-java@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'microsoft'
-      - name: make gradle wrapper executable
-        run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v7
+          
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: Artifacts
-          path: build/libs/
+          # This grabs all the built .jar files from your libs folder
+          files: build/libs/*.jar
+          generate_release_notes: true
