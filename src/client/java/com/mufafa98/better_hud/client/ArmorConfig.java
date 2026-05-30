@@ -12,6 +12,12 @@ public class ArmorConfig {
     public int gapBetweenItems = 4;
     public int gapBetweenIconAndText = 4;
 
+    public int lowDurabilityPercentage = 15;
+    public int lowDurabilityColor = 0xFFFF0000;
+
+    public int mediumDurabilityPercentage = 30;
+    public int mediumDurabilityColor = 0xFFFFFF00;
+
     public ArmorConfig() {
     }
 

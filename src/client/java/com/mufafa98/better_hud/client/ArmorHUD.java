@@ -133,9 +133,14 @@ public class ArmorHUD implements HUDInterface {
                 String text = "";
                 int color = 0xFFFFFFFF;
                 if (item.isDamageableItem()) {
-                    text = String.valueOf(item.getMaxDamage() - item.getDamageValue());
-                    if (item.getMaxDamage() - item.getDamageValue() <= item.getMaxDamage() * 0.1) {
-                        color = 0xFFFF0000;
+                    int remaining = item.getMaxDamage() - item.getDamageValue();
+                    text = String.valueOf(remaining);
+
+                    double percent = (double) remaining / item.getMaxDamage() * 100.0;
+                    if (percent <= config.lowDurabilityPercentage) {
+                        color = config.lowDurabilityColor;
+                    } else if (percent <= config.mediumDurabilityPercentage) {
+                        color = config.mediumDurabilityColor;
                     }
                 } else if (item.getCount() > 1) {
                     text = String.valueOf(countItemInInventory(client, item));
