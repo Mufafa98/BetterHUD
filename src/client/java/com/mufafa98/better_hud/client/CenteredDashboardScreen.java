@@ -12,15 +12,15 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ScrollableLayout;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public class CenteredDashboardScreen extends Screen {
     private static final int CONTROL_HEIGHT = 20;
-    private static final int SLIDER_WIDTH = 110;
-    private static final int VALUE_BOX_WIDTH = 40;
-    private static final int HEX_BOX_WIDTH = 110;
-    private static final int COLOR_PREVIEW_SIZE = 20;
+    private static final int COL1_WIDTH = 110;
+    private static final int COL2_WIDTH = 40;
+    private static final int COL_PADDING = 5;
 
     private final Screen parent;
     private ScrollableLayout layout;
@@ -53,10 +53,24 @@ public class CenteredDashboardScreen extends Screen {
 
         IntConsumer[] updaters = new IntConsumer[2];
 
-        rows.checkbox("Render Vertically", config.armor.renderVertically, value -> {
-            config.armor.renderVertically = value;
+        ArmorConfig.LayoutOrientation currentLayout = config.armor.layout != null
+                ? config.armor.layout
+                : ArmorConfig.LayoutOrientation.VERTICAL;
+
+        rows.cycle("Layout", new String[] { "VERTICAL", "HORIZONTAL" }, currentLayout.name(), value -> {
+            config.armor.layout = ArmorConfig.LayoutOrientation.valueOf(value);
             config.save();
         });
+
+        ArmorConfig.TextPosition currentTextPosition = config.armor.textPosition != null
+                ? config.armor.textPosition
+                : ArmorConfig.TextPosition.RIGHT;
+
+        rows.cycle("Text Position", new String[] { "LEFT", "RIGHT", "TOP", "BOTTOM" }, currentTextPosition.name(),
+                value -> {
+                    config.armor.textPosition = ArmorConfig.TextPosition.valueOf(value);
+                    config.save();
+                });
 
         rows.slider("Center X %", (int) (config.armor.centerX * 100), 100, percent -> {
             config.armor.centerX = percent / 100.0;
@@ -116,10 +130,12 @@ public class CenteredDashboardScreen extends Screen {
         }
 
         private IntConsumer slider(String name, int currentValue, int maxVal, IntConsumer onSave) {
-            EditBox editBox = new EditBox(mc.font, VALUE_BOX_WIDTH, CONTROL_HEIGHT, Component.literal(name));
+            LinearLayout rowLayout = LinearLayout.horizontal();
+
+            EditBox editBox = new EditBox(mc.font, COL2_WIDTH, CONTROL_HEIGHT, Component.literal(name));
             editBox.setValue(String.valueOf(currentValue));
 
-            var slider = new AbstractSliderButton(0, 0, SLIDER_WIDTH, CONTROL_HEIGHT,
+            var slider = new AbstractSliderButton(0, 0, COL1_WIDTH, CONTROL_HEIGHT,
                     Component.literal(name + ": " + currentValue),
                     (double) currentValue / maxVal) {
 
@@ -150,8 +166,10 @@ public class CenteredDashboardScreen extends Screen {
                 }
             });
 
-            grid.addChild(slider, row, 0);
-            grid.addChild(editBox, row, 1);
+            rowLayout.addChild(slider);
+            rowLayout.addChild(editBox, settings -> settings.paddingLeft(COL_PADDING));
+
+            grid.addChild(rowLayout, row++, 0);
             row++;
 
             return newValue -> {
@@ -164,13 +182,14 @@ public class CenteredDashboardScreen extends Screen {
         }
 
         private void color(String labelText, int currentColor, Consumer<Integer> onSave) {
-            this.grid.addChild(new StringWidget(Component.literal(labelText), mc.font), row, 0, 1, 2);
+            LinearLayout rowLayout = LinearLayout.horizontal();
+            this.grid.addChild(new StringWidget(Component.literal(labelText), mc.font), row, 0, 1, 1);
 
-            EditBox hexBox = new EditBox(mc.font, HEX_BOX_WIDTH, CONTROL_HEIGHT, Component.literal(labelText));
+            EditBox hexBox = new EditBox(mc.font, COL1_WIDTH, CONTROL_HEIGHT, Component.literal(labelText));
             hexBox.setValue(Integer.toHexString(currentColor).toUpperCase());
 
-            var preview = new net.minecraft.client.gui.components.AbstractWidget(0, 0, COLOR_PREVIEW_SIZE,
-                    COLOR_PREVIEW_SIZE, Component.empty()) {
+            var preview = new net.minecraft.client.gui.components.AbstractWidget(0, 0, COL2_WIDTH,
+                    CONTROL_HEIGHT, Component.empty()) {
                 private int color = currentColor;
 
                 public void updateColor(int newColor) {
@@ -201,9 +220,10 @@ public class CenteredDashboardScreen extends Screen {
                 }
             });
 
-            grid.addChild(hexBox, row + 1, 0);
-            grid.addChild(preview, row + 1, 1);
+            rowLayout.addChild(hexBox);
+            rowLayout.addChild(preview, settings -> settings.paddingLeft(COL_PADDING));
 
+            this.grid.addChild(rowLayout, row++, 0);
             this.row += 2;
         }
 
@@ -211,13 +231,13 @@ public class CenteredDashboardScreen extends Screen {
             this.grid.addChild(Checkbox.builder(Component.literal(label), mc.font)
                     .selected(selected)
                     .onValueChange((checkbox, value) -> onSave.accept(value))
-                    .build(), this.row++, 0, 1, 2);
+                    .build(), this.row++, 0, 1, 1);
         }
 
-        private void cycle(String label, int[] values, int currentValue, IntConsumer onSave) {
+        private void cycle(String label, String[] values, String currentValue, Consumer<String> onSave) {
             final int[] index = { 0 };
             for (int i = 0; i < values.length; i++) {
-                if (values[i] == currentValue) {
+                if (values[i].equalsIgnoreCase(currentValue)) {
                     index[0] = i;
                     break;
                 }
@@ -227,12 +247,14 @@ public class CenteredDashboardScreen extends Screen {
                     Component.literal(label + ": " + values[index[0]]),
                     btn -> {
                         index[0] = (index[0] + 1) % values.length;
-                        int newValue = values[index[0]];
+                        String newValue = values[index[0]];
                         btn.setMessage(Component.literal(label + ": " + newValue));
                         onSave.accept(newValue);
-                    }).build();
+                    })
+                    .size(COL1_WIDTH + COL_PADDING + COL2_WIDTH, CONTROL_HEIGHT)
+                    .build();
 
-            grid.addChild(button, row++, 0, 1, 2);
+            grid.addChild(button, row++, 0, 1, 1);
         }
 
         private int clamp(int value, int min, int max) {

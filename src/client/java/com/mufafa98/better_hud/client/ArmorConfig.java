@@ -12,6 +12,10 @@ public class ArmorConfig {
     public int gapBetweenItems = 4;
     public int gapBetweenIconAndText = 4;
 
+    public TextPosition textPosition = TextPosition.RIGHT;
+
+    public LayoutOrientation layout = LayoutOrientation.VERTICAL;
+
     public int lowDurabilityPercentage = 15;
     public int lowDurabilityColor = 0xFFFF0000;
 
@@ -37,5 +41,17 @@ public class ArmorConfig {
                 Math.min(
                         screenHeight - hudHeight - screenMargin,
                         centerAbs - hudHeight / 2));
+    }
+
+    public enum TextPosition {
+        LEFT,
+        RIGHT,
+        TOP,
+        BOTTOM
+    }
+
+    public enum LayoutOrientation {
+        VERTICAL,
+        HORIZONTAL
     }
 }

@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mufafa98.better_hud.client.ArmorConfig.LayoutOrientation;
+import com.mufafa98.better_hud.client.ArmorConfig.TextPosition;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.fabricmc.loader.api.FabricLoader;
@@ -13,7 +16,7 @@ public class Config {
     private static Config INSTANCE;
     private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("better-hud.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final int CURRENT_VERSION = 2;
+    private static final int CURRENT_VERSION = 3;
 
     // top-level version for the whole config file
     public int configVersion = CURRENT_VERSION;
@@ -54,20 +57,29 @@ public class Config {
                 }
                 if (fileVersion == CURRENT_VERSION) {
                     INSTANCE = GSON.fromJson(json, Config.class);
+                } else if (fileVersion == 2) {
+                    INSTANCE = GSON.fromJson(json, Config.class);
+
+                    INSTANCE.configVersion = CURRENT_VERSION;
+
+                    INSTANCE.armor.textPosition = TextPosition.RIGHT;
+                    INSTANCE.armor.layout = LayoutOrientation.VERTICAL;
+                    
+                    INSTANCE.save();
+
                 } else if (fileVersion == 1) {
-                    if (fileVersion == 1) {
-                        INSTANCE = GSON.fromJson(json, Config.class);
+                    INSTANCE = GSON.fromJson(json, Config.class);
 
-                        INSTANCE.configVersion = CURRENT_VERSION;
+                    INSTANCE.configVersion = CURRENT_VERSION;
 
-                        INSTANCE.armor.lowDurabilityPercentage = 15;
-                        INSTANCE.armor.lowDurabilityColor = 0xFFFF0000;
+                    INSTANCE.armor.lowDurabilityPercentage = 15;
+                    INSTANCE.armor.lowDurabilityColor = 0xFFFF0000;
 
-                        INSTANCE.armor.mediumDurabilityPercentage = 30;
-                        INSTANCE.armor.mediumDurabilityColor = 0xFFFFFF00;
+                    INSTANCE.armor.mediumDurabilityPercentage = 30;
+                    INSTANCE.armor.mediumDurabilityColor = 0xFFFFFF00;
 
-                        INSTANCE.save();
-                    }
+                    INSTANCE.save();
+
                 } else if (fileVersion == -1) {
                     // legacy single ArmorConfig JSON: try to parse as ArmorConfig and wrap it
                     try {
