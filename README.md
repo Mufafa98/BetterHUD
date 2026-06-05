@@ -1,4 +1,4 @@
-# Better HUD
+# MUD
 
 ## Setup
 

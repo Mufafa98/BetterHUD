@@ -1,4 +1,4 @@
-package com.mufafa98.better_hud.client;
+package com.mufafa98.mud.client;
 
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
@@ -26,7 +26,7 @@ public class CenteredDashboardScreen extends Screen {
     private ScrollableLayout layout;
 
     public CenteredDashboardScreen(Screen parent) {
-        super(Component.literal("Better HUD Dashboard"));
+        super(Component.literal("MUD Dashboard"));
         this.parent = parent;
     }
 

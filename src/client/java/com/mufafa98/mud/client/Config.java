@@ -1,12 +1,14 @@
-package com.mufafa98.better_hud.client;
+package com.mufafa98.mud.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mufafa98.better_hud.client.ArmorConfig.LayoutOrientation;
-import com.mufafa98.better_hud.client.ArmorConfig.TextPosition;
+import com.mufafa98.mud.client.Config;
+import com.mufafa98.mud.MUD;
+import com.mufafa98.mud.client.ArmorConfig.LayoutOrientation;
+import com.mufafa98.mud.client.ArmorConfig.TextPosition;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +16,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class Config {
     private static Config INSTANCE;
-    private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve("better-hud.json");
+    private static final Path PATH = FabricLoader.getInstance().getConfigDir().resolve(MUD.MOD_ID + ".json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final int CURRENT_VERSION = 3;
 
@@ -64,7 +66,7 @@ public class Config {
 
                     INSTANCE.armor.textPosition = TextPosition.RIGHT;
                     INSTANCE.armor.layout = LayoutOrientation.VERTICAL;
-                    
+
                     INSTANCE.save();
 
                 } else if (fileVersion == 1) {
