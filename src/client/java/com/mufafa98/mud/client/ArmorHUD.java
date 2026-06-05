@@ -1,4 +1,4 @@
-package com.mufafa98.better_hud.client;
+package com.mufafa98.mud.client;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;

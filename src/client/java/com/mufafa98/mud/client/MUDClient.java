@@ -1,4 +1,4 @@
-package com.mufafa98.better_hud.client;
+package com.mufafa98.mud.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -10,12 +10,12 @@ import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mufafa98.better_hud.BetterHUD;
+import com.mufafa98.mud.MUD;
 
-public class BetterHUDClient implements ClientModInitializer {
+public class MUDClient implements ClientModInitializer {
 	private static KeyMapping configKeyBinding;
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
-			Identifier.fromNamespaceAndPath(BetterHUD.MOD_ID, "better_hud"));
+			Identifier.fromNamespaceAndPath(MUD.MOD_ID, "mud"));
 
 	@Override
 	public void onInitializeClient() {
@@ -24,7 +24,7 @@ public class BetterHUDClient implements ClientModInitializer {
 		};
 
 		configKeyBinding = KeyMappingHelper.registerKeyMapping(
-				new KeyMapping("key.BetterHUD.config", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY));
+				new KeyMapping("key.MUD.config", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY));
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (configKeyBinding.consumeClick()) {
@@ -34,7 +34,7 @@ public class BetterHUDClient implements ClientModInitializer {
 
 		HudElementRegistry.attachElementBefore(
 				VanillaHudElements.HOTBAR,
-				Identifier.fromNamespaceAndPath(BetterHUD.MOD_ID, "armor_layer"),
+				Identifier.fromNamespaceAndPath(MUD.MOD_ID, "armor_layer"),
 				elements[0]::render);
 	}
 

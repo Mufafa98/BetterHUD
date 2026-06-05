@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "better-hud",
+	"id": "mud",
 	"version": "${version}",
-	"name": "Better HUD",
+	"name": "MUD",
 	"description": "This is a mod that adds various hud elements like armor durability and item counter",
 	"authors": [
 		"Mufafa98"
@@ -12,26 +12,19 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC-BY-NC-SA-4.0",
-	"icon": "assets/better-hud/icon.png",
+	"icon": "assets/mud/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.mufafa98.better_hud.BetterHUD"
+			"com.mufafa98.mud.MUD"
 		],
 		"client": [
-			"com.mufafa98.better_hud.client.BetterHUDClient"
+			"com.mufafa98.mud.client.MUDClient"
 		],
 		"modmenu": [
-			"com.mufafa98.better_hud.client.ModMenuIntegration"
+			"com.mufafa98.mud.client.ModMenuIntegration"
 		]
 	},
-	"mixins": [
-		"better-hud.mixins.json",
-		{
-			"config": "better-hud.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.19.2",
 		"minecraft": "~26.1",

@@ -14,7 +14,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"better-hud" {
+		"mud" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -30,9 +30,6 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-	// ModMenu via Modrinth
-    implementation "maven.modrinth:modmenu:18.0.0-beta.1"
 }
 
 processResources {

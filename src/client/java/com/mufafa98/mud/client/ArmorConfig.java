@@ -1,4 +1,4 @@
-package com.mufafa98.better_hud.client;
+package com.mufafa98.mud.client;
 
 public class ArmorConfig {
     // These two might me moved into Config
